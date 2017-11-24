@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="IBM position - Assessment Task">
+		<meta name="author" content="Bencs Balázs">
+		
+		<title>Facebook Posts list</title>
+		
+		<style>
+		.container{
+			width: 80%;
+			margin: 0 10%;
+		}
+		header {
+			width: 96%;
+			padding: 2%;
+			display: inline-block;
+			background:rgba(29,106,178,1);
+		}
+		header h2 {
+			float: left;
+		}
+		header #status {
+			float:right;
+		}
+		.post{
+			margin: 2%;
+			padding: 2%;
+			background:rgba(29,106,178,0.6);
+			border: solid 0.3em rgb(29,106,178);
+			box-shadow: 0 0 1em rgb(255,255,255) inline;
+		}
+		.post > div:last-child{
+			text-align: right;
+			font-weight: bold;
+			color: #fff;
+		}
+		</style>
+		
+	</head>
+	<body>
+		<header>
+			<div class="container">
+				<h2>IBM assessment task - Facebook Posts</h2>
+				<div id="status"></div>
+			</div>
+		</header>
+		<main class="container"></main>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script>
+	  function statusChangeCallback(response) {
+		if (response.status === 'connected') {
+		  testAPI();
+		} else {
+		  $("$status").html('<p>Please log into this app.</p><fb:login-button scope="public_profile,email" id="loginbutton" onlogin="checkLoginState();"></fb:login-button>');
+		}
+	  }
+
+	  // This function is called when someone finishes with the Login Button.
+	  function checkLoginState() {
+		FB.getLoginStatus(function(response) {
+		  statusChangeCallback(response);
+		});
+	  }
+
+	  window.fbAsyncInit = function() {
+	  FB.init({
+		appId      : '540802199590930',
+		cookie     : true,  // enable cookies to allow the server to access the session
+		xfbml      : true,  // parse social plugins on this page
+		version    : 'v2.8' // use graph api version 2.8
+	  });
+
+	  FB.getLoginStatus(function(response) {
+		statusChangeCallback(response);
+	  });
+
+	  };
+
+	  // Load the SDK asynchronously
+	  (function(d, s, id) {
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id)) return;
+		js = d.createElement(s); js.id = id;
+		js.src = "https://connect.facebook.net/en_US/sdk.js";
+		fjs.parentNode.insertBefore(js, fjs);
+	  }(document, 'script', 'facebook-jssdk'));
+
+	  // Now, use the results
+	  function testAPI() {
+		FB.api('/me?fields=id,name,picture', function(response) {
+			$("#status").html('Logged in as ' + response.name + '! <img src="'+ response.picture.data.url +'">');
+			
+		});
+		
+		// Parse the posts
+		FB.api("/me/feed?limit=10", function (response) {
+			if (response && !response.error) {
+				var posts = response.data;
+				$(posts).each(function(){
+					message = (this.message) ? this.message : "";
+					story = (this.story) ? this.story : "";
+					
+					$("<div/>",{
+						class: "post",
+						html: "<div>"+message+"</div>"+"<div>"+story+"</div><div>"+this.created_time+"</div>"
+					}).appendTo("main");
+				});
+				
+			}
+		}
+		);
+		
+	  }
+	  
+	</script>	
+	</body>
+</html>
